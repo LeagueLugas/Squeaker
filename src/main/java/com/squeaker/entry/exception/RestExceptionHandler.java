@@ -101,5 +101,10 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 
+    @ExceptionHandler({ ImageNotFoundException.class })
+    protected ResponseEntity<Object> imageNotFound(Exception ex, WebRequest request) {
+        return handleExceptionInternal(ex, "Image Not Found",
+                new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    }
 
 }
