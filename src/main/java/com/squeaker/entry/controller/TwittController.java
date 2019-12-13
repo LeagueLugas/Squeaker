@@ -9,7 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("/twitt")
+@RequestMapping("/api/v1/twitt")
 public class TwittController {
 
     @Autowired
