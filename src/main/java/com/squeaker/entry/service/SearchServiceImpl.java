@@ -13,7 +13,7 @@ import java.util.List;
 @Service
 public class SearchServiceImpl implements SearchService {
 
-    private static final String IMAGE_DIR = "D:/Squeaker/user/";
+    private static final String IMAGE_DIR = "/home/ubuntu/server/Squeaker/images/user/";
 
     private UserRepository userRepository;
 

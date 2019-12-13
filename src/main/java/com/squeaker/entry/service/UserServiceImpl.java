@@ -25,7 +25,7 @@ import java.util.UUID;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private static final String IMAGE_DIR = "D:/Squeaker/user/";
+    private static final String IMAGE_DIR = "/home/ubuntu/server/Squeaker/images/user/";
 
     private AuthMailRepository authMailRepository;
     private UserRepository userRepository;
@@ -55,6 +55,16 @@ public class UserServiceImpl implements UserService {
                         .authState("UnAuthorized")
                         .build()
         );
+
+        new Thread(() -> {
+            try {
+                Thread.sleep(300000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            EmailAuth emailAuth = authMailRepository.findByAuthEmail(email);
+            authMailRepository.delete(emailAuth);
+        });
 
         return new AuthCodeResponse(uuid);
     }
@@ -94,7 +104,7 @@ public class UserServiceImpl implements UserService {
         if(auth.getAuthState().equals("UnAuthorized")) throw new InvalidAuthCodeException();
 
         if(userSignUp.getMultipartFile() != null) {
-            File file = new File("D:\\Squeaker\\user\\"+userSignUp.getUserId()+".jpg");
+            File file = new File(IMAGE_DIR + userSignUp.getUserId() + ".jpg");
             try {
                 FileWriter fileWriter = new FileWriter(file);
                 fileWriter.close();
@@ -115,20 +125,10 @@ public class UserServiceImpl implements UserService {
                 .userPrivate(0)
                 .build()
         );
-
-        new Thread(() -> {
-            try {
-                Thread.sleep(300000);
-                EmailAuth emailAuth = authMailRepository.findByAuthEmail(userSignUp.getUserId());
-                authMailRepository.delete(emailAuth);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        });
     }
 
     @Override
-    public void changeUser(User info, MultipartFile file) {
+    public void changeUser(User info, MultipartFile multipartFile) {
         User user = userRepository.findByUserId(info.getUserId());
         if(user == null) throw new UserNotFoundException();
 
@@ -136,6 +136,19 @@ public class UserServiceImpl implements UserService {
         if (info.getUserName() != null) user.setUserName(info.getUserName());
         if (info.getUserIntro() != null) user.setUserIntro(info.getUserIntro());
         if (info.getUserPrivate() != null) user.setUserPrivate(info.getUserPrivate());
+
+        if(multipartFile != null) {
+            File file = new File(IMAGE_DIR + user.getUserId() + ".jpg");
+            file.delete();
+            try {
+                FileWriter fileWriter = new FileWriter(file);
+                fileWriter.close();
+                multipartFile.transferTo(file);
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new InvalidFileException();
+            }
+        }
 
         userRepository.save(user);
     }
@@ -145,6 +158,9 @@ public class UserServiceImpl implements UserService {
         String userId = JwtUtil.parseToken(token);
         User user = userRepository.findByUserId(userId);
         if(user == null) throw new UserNotFoundException();
+
+        File file = new File(IMAGE_DIR + user.getUserId() + ".jpg");
+        file.delete();
 
         userRepository.delete(user);
     }

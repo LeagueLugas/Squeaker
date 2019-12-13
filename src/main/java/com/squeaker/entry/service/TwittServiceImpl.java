@@ -21,7 +21,7 @@ import java.util.List;
 @Service
 public class TwittServiceImpl implements TwittService {
 
-    private static final String IMAGE_DIR = "D:/Squeaker/twitt/";
+    private static final String IMAGE_DIR = "/home/ubuntu/server/Squeaker/images/twitt/";
 
     private UserRepository userRepository;
     private TwittRepository twittRepository;
