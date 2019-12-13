@@ -20,12 +20,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {
 
-    private static final String IMAGE_DIR = "/home/ubuntu/server/Squeaker/images/user/";
+    //private static final String IMAGE_DIR = "/home/ubuntu/server/Squeaker/images/user/";
+    private static final String IMAGE_DIR = "D:/Squeaker/user/";
 
     private AuthMailRepository authMailRepository;
     private UserRepository userRepository;
@@ -91,6 +93,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse getUser(Integer uuid) {
         User user = userRepository.findByUuid(uuid);
         if(user == null) throw new UserNotFoundException();
+        if(user.getUserPrivate() == 1) throw new UserPrivateException();
 
         return userResponse(user);
     }
@@ -104,7 +107,9 @@ public class UserServiceImpl implements UserService {
         if(auth.getAuthState().equals("UnAuthorized")) throw new InvalidAuthCodeException();
 
         if(userSignUp.getMultipartFile() != null) {
-            File file = new File(IMAGE_DIR + userSignUp.getUserId() + ".jpg");
+            String fileName = userSignUp.getMultipartFile().getOriginalFilename();
+            File file = new File(IMAGE_DIR + userSignUp.getUserId() + "."
+                    + fileName.substring(fileName.lastIndexOf(".")+1));
             try {
                 FileWriter fileWriter = new FileWriter(file);
                 fileWriter.close();
@@ -138,7 +143,10 @@ public class UserServiceImpl implements UserService {
         if (info.getUserPrivate() != null) user.setUserPrivate(info.getUserPrivate());
 
         if(multipartFile != null) {
-            File file = new File(IMAGE_DIR + user.getUserId() + ".jpg");
+            String fileName = multipartFile.getOriginalFilename();
+            File file = new File(IMAGE_DIR + user.getUserId() + "."
+                    + fileName.substring(fileName.lastIndexOf(".")+1));
+            file.deleteOnExit();
             try {
                 FileWriter fileWriter = new FileWriter(file);
                 fileWriter.close();
@@ -158,8 +166,14 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByUserId(userId);
         if(user == null) throw new UserNotFoundException();
 
-        File file = new File(IMAGE_DIR + user.getUserId() + ".jpg");
-        file.delete();
+        for(File file : Objects.requireNonNull(new File(IMAGE_DIR).listFiles())) {
+            String fullFileName = file.getName();
+            String fileName = fullFileName.substring(0, fullFileName.lastIndexOf("."));
+            if(fileName.equals(user.getUserId())) {
+                file.delete();
+                break;
+            }
+        }
 
         userRepository.delete(user);
     }

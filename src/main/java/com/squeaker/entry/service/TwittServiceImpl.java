@@ -21,7 +21,8 @@ import java.util.List;
 @Service
 public class TwittServiceImpl implements TwittService {
 
-    private static final String IMAGE_DIR = "/home/ubuntu/server/Squeaker/images/twitt/";
+    //private static final String IMAGE_DIR = "/home/ubuntu/server/Squeaker/images/twitt/";
+    private static final String IMAGE_DIR = "D:/Squeaker/twitt/";
 
     private UserRepository userRepository;
     private TwittRepository twittRepository;
@@ -88,10 +89,12 @@ public class TwittServiceImpl implements TwittService {
         if(files == null) return;
 
         for(int i = 0; i < files.length; i++) {
+            String fileFullName = files[i].getOriginalFilename();
+            String filename = fileFullName.substring(fileFullName.lastIndexOf(".")+1);
             Image image = imageRepository.save(
                     Image.builder()
                     .twittId(twitt.getTwittId())
-                    .imageName("image_"+ twitt.getTwittId() +"-"+ i +".jpg")
+                    .imageName("image_"+ twitt.getTwittId() +"-"+ i +"." + filename)
                     .build()
             );
             file = new File(IMAGE_DIR + image.getImageName());
@@ -118,7 +121,10 @@ public class TwittServiceImpl implements TwittService {
         List<Image> images = imageRepository.findByTwittId(twittId);
 
         if(twittLike != null) twittLikeRespository.delete(twittLike);
-        for (Image i : images) imageRepository.delete(i);
+        for (Image i : images) {
+            new File(IMAGE_DIR + i.getImageName()).delete();
+            imageRepository.delete(i);
+        }
         twittRepository.delete(twitt);
     }
 

@@ -7,6 +7,7 @@ import com.squeaker.entry.domain.repository.UserRepository;
 import com.squeaker.entry.exception.AlreadyFollowException;
 import com.squeaker.entry.exception.AlreadyUnFollowException;
 import com.squeaker.entry.exception.UserNotFoundException;
+import com.squeaker.entry.exception.UserPrivateException;
 import com.squeaker.entry.utils.JwtUtil;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +28,7 @@ public class FollowServiceImpl implements FollowService {
         User target = userRepository.findByUuid(uuid);
 
         if(user == null || target == null) throw new UserNotFoundException();
+        if(target.getUserPrivate() == 1) throw new UserPrivateException();
 
         Follow follow = followRepository.findByFollowerAndFollowing(user.getUuid(), target.getUuid());
         if(follow != null) throw new AlreadyFollowException();
