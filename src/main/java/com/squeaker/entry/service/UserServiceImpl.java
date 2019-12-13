@@ -139,7 +139,6 @@ public class UserServiceImpl implements UserService {
 
         if(multipartFile != null) {
             File file = new File(IMAGE_DIR + user.getUserId() + ".jpg");
-            file.delete();
             try {
                 FileWriter fileWriter = new FileWriter(file);
                 fileWriter.close();
