@@ -54,7 +54,7 @@ public class UserController {
     }
 
     @PutMapping
-    public void changeUser(@RequestHeader("Authotization") String token,
+    public void changeUser(@RequestHeader("Authorization") String token,
                            @RequestParam(required = false) String userPw, String userName, String userIntro,
                            Integer userPrivate, @RequestParam(value = "file", required = false) MultipartFile file) {
 
