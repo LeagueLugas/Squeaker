@@ -15,7 +15,7 @@ import java.io.*;
 @RequestMapping("/api/v1/image")
 public class ImageController {
 
-    private final String IMAGE_DIR = "D:/Squeaker/";
+    private final String IMAGE_DIR = "/home/ubuntu/server/images/";
 
     @GetMapping(value = "/{imageName:.+}", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_GIF_VALUE, MediaType.IMAGE_PNG_VALUE})
     public byte[] getImage(@PathVariable String imageName) {

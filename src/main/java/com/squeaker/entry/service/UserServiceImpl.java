@@ -26,8 +26,8 @@ import java.util.UUID;
 @Service
 public class UserServiceImpl implements UserService {
 
-    //private static final String IMAGE_DIR = "/home/ubuntu/server/Squeaker/images/user/";
-    private static final String IMAGE_DIR = "D:/Squeaker/user/";
+    private static final String IMAGE_DIR = "/home/ubuntu/server/images/user/";
+    // private static final String IMAGE_DIR = "D:/Squeaker/user/";
 
     private AuthMailRepository authMailRepository;
     private UserRepository userRepository;
@@ -149,6 +149,7 @@ public class UserServiceImpl implements UserService {
             file.deleteOnExit();
             try {
                 FileWriter fileWriter = new FileWriter(file);
+		fileWriter.flush();
                 fileWriter.close();
                 multipartFile.transferTo(file);
             } catch (IOException e) {
