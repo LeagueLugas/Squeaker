@@ -1,6 +1,7 @@
 package com.squeaker.entry.controller;
 
 import com.squeaker.entry.exception.ImageNotFoundException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,7 +16,8 @@ import java.io.*;
 @RequestMapping("/api/v1/image")
 public class ImageController {
 
-    private final String IMAGE_DIR = "/home/ubuntu/server/images/";
+    @Value("${squeaker.image-dir}")
+    private String IMAGE_DIR;
 
     @GetMapping(value = "/{imageName:.+}", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_GIF_VALUE, MediaType.IMAGE_PNG_VALUE})
     public byte[] getImage(@PathVariable String imageName) {

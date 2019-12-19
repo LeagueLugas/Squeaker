@@ -5,6 +5,7 @@ import com.squeaker.entry.domain.payload.response.SearchUserResponse;
 import com.squeaker.entry.domain.repository.UserRepository;
 import com.squeaker.entry.exception.UserNotFoundException;
 import com.squeaker.entry.utils.JwtUtil;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -15,8 +16,8 @@ import java.util.Objects;
 @Service
 public class SearchServiceImpl implements SearchService {
 
-    private static final String IMAGE_DIR = "/home/ubuntu/server/images/user/";
-    // private static final String IMAGE_DIR = "D:/Squeaker/user/";
+    @Value("${squeaker.image-dir}")
+    private String IMAGE_DIR;
 
     private UserRepository userRepository;
 
@@ -35,7 +36,7 @@ public class SearchServiceImpl implements SearchService {
         for(User u : users) {
             if(user.getUserPrivate() == 1) continue;
             String imageName = "jpg";
-            for(File file : Objects.requireNonNull(new File(IMAGE_DIR).listFiles())) {
+            for(File file : Objects.requireNonNull(new File(IMAGE_DIR + "user/").listFiles())) {
                 String fullFileName = file.getName();
                 String fileName = fullFileName.substring(0, fullFileName.lastIndexOf("."));
                 if(fileName.equals(user.getUserId())) {

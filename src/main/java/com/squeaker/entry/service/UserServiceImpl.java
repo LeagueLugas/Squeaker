@@ -12,6 +12,7 @@ import com.squeaker.entry.domain.payload.response.user.UserResponse;
 import com.squeaker.entry.domain.repository.*;
 import com.squeaker.entry.exception.*;
 import com.squeaker.entry.utils.JwtUtil;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,8 +27,8 @@ import java.util.UUID;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private static final String IMAGE_DIR = "/home/ubuntu/server/images/user/";
-    // private static final String IMAGE_DIR = "D:/Squeaker/user/";
+    @Value("${squeaker.image-dir}")
+    private String IMAGE_DIR;
 
     private AuthMailRepository authMailRepository;
     private UserRepository userRepository;
@@ -108,7 +109,7 @@ public class UserServiceImpl implements UserService {
 
         if(userSignUp.getMultipartFile() != null) {
             String fileName = userSignUp.getMultipartFile().getOriginalFilename();
-            File file = new File(IMAGE_DIR + userSignUp.getUserId() + "."
+            File file = new File(IMAGE_DIR + "user/" + userSignUp.getUserId() + "."
                     + fileName.substring(fileName.lastIndexOf(".")+1));
             try {
                 FileWriter fileWriter = new FileWriter(file);
@@ -143,13 +144,19 @@ public class UserServiceImpl implements UserService {
         if (info.getUserPrivate() != null) user.setUserPrivate(info.getUserPrivate());
 
         if(multipartFile != null) {
-            String fileName = multipartFile.getOriginalFilename();
-            File file = new File(IMAGE_DIR + user.getUserId() + "."
-                    + fileName.substring(fileName.lastIndexOf(".")+1));
-            file.deleteOnExit();
+            String fileName;
+            for(File f : new File(IMAGE_DIR + "user/").listFiles()) {
+                fileName = f.getName();
+                if(fileName.substring(0, fileName.lastIndexOf(".")).equals(user.getUserId())) {
+                    System.out.println(fileName);
+                    f.delete();
+                    break;
+                }
+            }
             try {
+                fileName = multipartFile.getOriginalFilename();
+                File file = new File(IMAGE_DIR + "user/" + user.getUserId() + "." + fileName.substring(fileName.lastIndexOf(".")+1));
                 FileWriter fileWriter = new FileWriter(file);
-		fileWriter.flush();
                 fileWriter.close();
                 multipartFile.transferTo(file);
             } catch (IOException e) {
@@ -167,7 +174,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByUserId(userId);
         if(user == null) throw new UserNotFoundException();
 
-        for(File file : Objects.requireNonNull(new File(IMAGE_DIR).listFiles())) {
+        for(File file : Objects.requireNonNull(new File(IMAGE_DIR + "user/").listFiles())) {
             String fullFileName = file.getName();
             String fileName = fullFileName.substring(0, fullFileName.lastIndexOf("."));
             if(fileName.equals(user.getUserId())) {
@@ -195,7 +202,7 @@ public class UserServiceImpl implements UserService {
                                 .uuid(follow.getUuid())
                                 .userId(follow.getUserId())
                                 .userName(follow.getUserName())
-                                .userImage(IMAGE_DIR + follow.getUserId()+".jpg")
+                                .userImage(follow.getUserId()+".jpg")
                                 .build()
                 );
             } else {

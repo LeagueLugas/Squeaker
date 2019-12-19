@@ -8,6 +8,7 @@ import com.squeaker.entry.exception.TwittNotFoundException;
 import com.squeaker.entry.exception.UserNotFoundException;
 import com.squeaker.entry.exception.UserNotMatchException;
 import com.squeaker.entry.utils.JwtUtil;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,8 +22,8 @@ import java.util.List;
 @Service
 public class TwittServiceImpl implements TwittService {
 
-    private static final String IMAGE_DIR = "/home/ubuntu/server/images/twitt/";
-    // private static final String IMAGE_DIR = "D:/Squeaker/twitt/";
+    @Value("${squeaker.image-dir}")
+    private String IMAGE_DIR;
 
     private UserRepository userRepository;
     private TwittRepository twittRepository;
@@ -97,7 +98,7 @@ public class TwittServiceImpl implements TwittService {
                     .imageName("image_"+ twitt.getTwittId() +"-"+ i +"." + filename)
                     .build()
             );
-            file = new File(IMAGE_DIR + image.getImageName());
+            file = new File(IMAGE_DIR + "twitt/" + image.getImageName());
             try {
                 fileWriter = new FileWriter(file);
                 fileWriter.close();
@@ -122,7 +123,8 @@ public class TwittServiceImpl implements TwittService {
 
         if(twittLike != null) twittLikeRespository.delete(twittLike);
         for (Image i : images) {
-            new File(IMAGE_DIR + i.getImageName()).delete();
+            File file = new File(IMAGE_DIR + "twitt/" + i.getImageName());
+            file.delete();
             imageRepository.delete(i);
         }
         twittRepository.delete(twitt);
@@ -134,7 +136,7 @@ public class TwittServiceImpl implements TwittService {
         List<Comment> comments = commentRepository.findByCommentTwitIdOrderByCommentDateAsc(twitt.getTwittId());
 
         for(Image image : images)
-            imageList.add(IMAGE_DIR + image.getImageName());
+            imageList.add(image.getImageName());
 
         return TwittResponse.builder()
                 .twittId(twitt.getTwittId())
