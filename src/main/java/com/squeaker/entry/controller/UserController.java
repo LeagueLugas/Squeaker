@@ -13,7 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.constraints.NotNull;
 
 @RestController
-@RequestMapping("/api/v1/user")
+@RequestMapping("/user")
 public class UserController {
 
     @Autowired

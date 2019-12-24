@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.constraints.NotNull;
 
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/auth")
 public class AuthController {
 
     @Autowired

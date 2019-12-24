@@ -8,14 +8,14 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/search")
+@RequestMapping("/search")
 public class SearchController {
 
     @Autowired
     private SearchServiceImpl searchService;
 
-    @GetMapping("/{userName}")
-    public List<SearchUserResponse> searchUser(@RequestHeader("Authorization") String token, @PathVariable String userName) {
+    @GetMapping
+    public List<SearchUserResponse> searchUser(@RequestHeader("Authorization") String token, @RequestParam String userName) {
         return searchService.searchUser(token, userName);
     }
 }

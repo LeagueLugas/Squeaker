@@ -13,7 +13,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 
 @RestController
-@RequestMapping("/api/v1/image")
+@RequestMapping("/image")
 public class ImageController {
 
     @Value("${squeaker.image-dir}")
@@ -22,7 +22,7 @@ public class ImageController {
     @GetMapping(value = "/{imageName:.+}", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_GIF_VALUE, MediaType.IMAGE_PNG_VALUE})
     public byte[] getImage(@PathVariable String imageName) {
         File file;
-        if(new File(IMAGE_DIR + "user/"+imageName).exists()) {
+        if(isUserImage(imageName)) {
             file = new File(IMAGE_DIR + "user/"+imageName);
         } else {
             file = new File(IMAGE_DIR + "twitt/"+imageName);
@@ -31,16 +31,21 @@ public class ImageController {
         InputStream inputStream;
         BufferedImage bi;
         ByteArrayOutputStream bos;
+        String fileName = file.getName();
         try {
             inputStream = new FileInputStream(file);
             bi = ImageIO.read(inputStream);
             bos = new ByteArrayOutputStream();
-            ImageIO.write(bi, file.getName().substring(file.getName().lastIndexOf(".")+1), bos);
+            ImageIO.write(bi, fileName.substring(fileName.lastIndexOf(".")+1), bos);
         } catch (Exception e) {
             // e.printStackTrace();
             throw new ImageNotFoundException();
         }
 
         return bos.toByteArray();
+    }
+
+    private boolean isUserImage(String imageName) {
+        return new File(IMAGE_DIR + "user/"+imageName).exists();
     }
 }

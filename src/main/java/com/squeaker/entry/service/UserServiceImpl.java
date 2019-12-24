@@ -11,6 +11,7 @@ import com.squeaker.entry.domain.payload.response.user.FollowResponse;
 import com.squeaker.entry.domain.payload.response.user.UserResponse;
 import com.squeaker.entry.domain.repository.*;
 import com.squeaker.entry.exception.*;
+import com.squeaker.entry.utils.EmailService;
 import com.squeaker.entry.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -50,7 +51,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public AuthCodeResponse authEmail(String email) {
-        String uuid = UUID.randomUUID().toString();
+        String uuid = randomCode();
         authMailRepository.save(
                 EmailAuth.builder()
                         .authEmail(email)
@@ -60,6 +61,7 @@ public class UserServiceImpl implements UserService {
         );
 
         new Thread(() -> {
+            EmailService.sendMail(email, uuid);
             try {
                 Thread.sleep(300000);
             } catch (InterruptedException e) {
@@ -190,11 +192,20 @@ public class UserServiceImpl implements UserService {
         List<TwittResponse> twitts = new ArrayList<>();
         List<FollowResponse> follower = new ArrayList<>();
         List<FollowResponse> following = new ArrayList<>();
+        File[] fileList = new File(IMAGE_DIR + "user/").listFiles();
+        String fileExtension = ".jpg";
 
         for(Twitt twitt : twittRepository.findByTwittUidOrderByTwittDateDesc(user.getUuid())) {
             twitts.add(TwittServiceImpl.getTwittInfo(user, twitt, imageRepository, twittLikeRespository, commentRepository));
         }
         for(Follow follows : followRepository.findByFollowerOrFollowing(user.getUuid(), user.getUuid())) {
+            for (File f : fileList) {
+                String fileFullName = f.getName();
+                String fileName = fileFullName.substring(0, fileFullName.lastIndexOf("."));
+                if(fileName.equals(user.getUserId())) {
+                    fileExtension = fileFullName.substring(fileFullName.lastIndexOf(".")+1);
+                }
+            }
             if(follows.getFollower().equals(user.getUuid())) {
                 User follow = userRepository.findByUuid(follows.getFollowing());
                 following.add(
@@ -202,7 +213,7 @@ public class UserServiceImpl implements UserService {
                                 .uuid(follow.getUuid())
                                 .userId(follow.getUserId())
                                 .userName(follow.getUserName())
-                                .userImage(follow.getUserId()+".jpg")
+                                .userImage(follow.getUserId()+"."+fileExtension)
                                 .build()
                 );
             } else {
@@ -212,9 +223,17 @@ public class UserServiceImpl implements UserService {
                                 .uuid(follow.getUuid())
                                 .userId(follow.getUserId())
                                 .userName(follow.getUserName())
-                                .userImage(follow.getUserId()+".jpg")
+                                .userImage(follow.getUserId()+"."+fileExtension)
                                 .build()
                 );
+            }
+        }
+
+        for (File f : fileList) {
+            String fileFullName = f.getName();
+            String fileName = fileFullName.substring(0, fileFullName.lastIndexOf("."));
+            if(fileName.equals(user.getUserId())) {
+                fileExtension = fileFullName.substring(fileFullName.lastIndexOf(".")+1);
             }
         }
 
@@ -223,10 +242,22 @@ public class UserServiceImpl implements UserService {
                 .userId(user.getUserId())
                 .userName(user.getUserName())
                 .userIntro(user.getUserIntro())
-                .userImage(user.getUserId()+".jpg")
+                .userImage(user.getUserId()+"."+fileExtension)
                 .timeLine(twitts)
                 .follower(follower)
                 .following(following)
                 .build();
+    }
+
+    private String randomCode() {
+        StringBuilder code = new StringBuilder();
+        String[] codeList = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+        int random;
+        for (int i = 0; i < 6; i++) {
+            random = (int) (Math.random() * codeList.length);
+            code.append(codeList[random]);
+        }
+
+        return code.toString();
     }
 }
