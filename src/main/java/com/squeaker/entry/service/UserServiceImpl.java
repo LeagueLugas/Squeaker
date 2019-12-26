@@ -23,13 +23,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {
 
-    @Value("${squeaker.image-dir}")
-    private String IMAGE_DIR;
+    //@Value("${squeaker.image-dir}")
+    private String IMAGE_DIR = "/home/ubuntu/server/images/";
 
     private AuthMailRepository authMailRepository;
     private UserRepository userRepository;
