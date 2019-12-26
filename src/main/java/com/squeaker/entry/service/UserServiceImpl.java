@@ -27,8 +27,8 @@ import java.util.Objects;
 @Service
 public class UserServiceImpl implements UserService {
 
-    //@Value("${squeaker.image-dir}")
-    private String IMAGE_DIR = "/home/ubuntu/server/images/";
+    @Value("${squeaker.image-dir}")
+    private String IMAGE_DIR;
 
     private AuthMailRepository authMailRepository;
     private UserRepository userRepository;
