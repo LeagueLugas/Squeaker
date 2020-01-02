@@ -5,7 +5,6 @@ import com.squeaker.entry.domain.entitys.Follow;
 import com.squeaker.entry.domain.entitys.Twitt;
 import com.squeaker.entry.domain.entitys.User;
 import com.squeaker.entry.domain.payload.request.UserSignUp;
-import com.squeaker.entry.domain.payload.response.AuthCodeResponse;
 import com.squeaker.entry.domain.payload.response.TwittResponse;
 import com.squeaker.entry.domain.payload.response.user.FollowResponse;
 import com.squeaker.entry.domain.payload.response.user.UserResponse;
@@ -49,7 +48,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public AuthCodeResponse authEmail(String email) {
+    public void authEmail(String email) {
         String uuid = randomCode();
         authMailRepository.save(
                 EmailAuth.builder()
@@ -59,8 +58,8 @@ public class UserServiceImpl implements UserService {
                         .build()
         );
 
+        EmailService.sendMail(email, uuid);
         new Thread(() -> {
-            EmailService.sendMail(email, uuid);
             try {
                 Thread.sleep(300000);
             } catch (InterruptedException e) {
@@ -69,8 +68,6 @@ public class UserServiceImpl implements UserService {
             EmailAuth emailAuth = authMailRepository.findByAuthEmail(email);
             authMailRepository.delete(emailAuth);
         });
-
-        return new AuthCodeResponse(uuid);
     }
 
     @Override
