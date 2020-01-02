@@ -34,8 +34,8 @@ public class UserController {
     }
 
     @PostMapping("/validemail")
-    public void validEmail(@RequestParam String code) {
-        userService.validEmail(code);
+    public void validEmail(@RequestParam String email, String code) {
+        userService.validEmail(email, code);
     }
 
     @PostMapping

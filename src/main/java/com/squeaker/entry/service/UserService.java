@@ -9,7 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public interface UserService {
     void authEmail(String email);
-    void validEmail(String code);
+    void validEmail(String email, String code);
     UserResponse getUserInfo(String token);
     UserResponse getUser(Integer uuid);
     void signUp(UserSignUp userSignUp);

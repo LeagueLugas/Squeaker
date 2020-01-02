@@ -1,6 +1,7 @@
 package com.squeaker.entry.utils;
 
 import com.sendgrid.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -11,7 +12,8 @@ import java.io.InputStreamReader;
 
 public class EmailService {
 
-    private static final String API_KEY = "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";
+    @Value("${squeaker.sendgrid-key}")
+    private static String API_KEY;
 
     public static void sendMail(String email, String data) {
         Email from = new Email("squeaker@entry.com");

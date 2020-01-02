@@ -71,8 +71,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void validEmail(String code) {
-        EmailAuth auth = authMailRepository.findByAuthCode(code);
+    public void validEmail(String email, String code) {
+        EmailAuth auth = authMailRepository.findByAuthEmailAndAuthCode(email, code);
         if(auth == null) throw new InvalidAuthCodeException();
 
         auth.setAuthState("Authorized");
