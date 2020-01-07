@@ -55,6 +55,11 @@ public class TwittServiceImpl implements TwittService {
         List<Twitt> twittList = twittRepository.findByTwittUidInOrderByTwittDateDesc(relationUser);
 
         for(int i = (count-1)*10; i < (count*10)-1; i++) {
+            User writer = userRepository.findByUuid(twittList.get(i).getTwittUid());
+            if(writer.getUserPrivate() == 1) {
+                i--;
+                continue;
+            }
             try {
                 twitts.add(getTwittInfo(user, twittList.get(i), imageRepository, twittLikeRespository, commentRepository));
             } catch (Exception e){
