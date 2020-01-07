@@ -16,6 +16,7 @@ public class EmailService {
     private static String API_KEY;
 
     public static void sendMail(String email, String data) {
+        API_KEY = "";
         Email from = new Email("squeaker@entry.com");
         String subject = "Squeaker SNS 회원가입 인증코드";
         Email to = new Email(email);

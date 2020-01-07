@@ -16,8 +16,8 @@ public class TwittController {
     TwittServiceImpl twittService;
 
     @GetMapping
-    public List<TwittResponse> getTwitts(@RequestHeader("Authorization") String token, @RequestParam Integer count) {
-        return twittService.getTwitts(token, count);
+    public List<TwittResponse> getTwitts(@RequestHeader("Authorization") String token, @RequestParam String count) {
+        return twittService.getTwitts(token, Integer.parseInt(count));
     }
 
     @GetMapping("/{twiitId}")
